@@ -1,0 +1,31 @@
+.post {
+	background: var(--gray-800);
+	padding: 2.5rem;
+	border-radius: 8px;
+}
+
+.post header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.author {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}
+
+.authorInfo {
+	display: flex;
+	line-height: 1.6;
+	flex-direction: column;
+}
+
+.avatar {
+	box-sizing: initial;
+	height: 3.75rem;
+	width: 3.75rem;
+	border: 4px solid var(--gray-800);
+	outline: 4px solid var(--green-light);
+	border-radius: 5px;
+}
