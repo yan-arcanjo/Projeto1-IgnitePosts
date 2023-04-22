@@ -3,6 +3,8 @@ import { Header } from "./components/Header";
 import styles from "./App.module.css";
 import { Post } from "./components/Post";
 import { Sidebar } from "./components/Sidebar";
+import { Modal } from "./components/Modal";
+import { useState } from "react";
 
 // author: {avatar_url: "", name: "", role: ""}
 // publishedAt: Date
@@ -60,10 +62,24 @@ const posts = [
 ];
 
 function App() {
+	console.log(styles);
+	const [modalOn, setModalOn] = useState(false);
+	const [modalDeleteComment, setModalDeleteComment] = useState({});
+
+	function deleteComment(comments, setComments, comment) {
+		setModalDeleteComment({
+			comments: comments,
+			setComments: setComments,
+			comment: comment,
+		});
+	}
+
 	return (
 		<div>
+			{modalOn ? (
+				<Modal setModal={setModalOn} deleteComment={modalDeleteComment} />
+			) : null}
 			<Header />
-
 			<div className={styles.wrapper}>
 				<Sidebar />
 				<main>
@@ -74,6 +90,8 @@ function App() {
 								author={post.author}
 								content={post.content}
 								publishedAt={post.publishedAt}
+								turnOnModal={setModalOn}
+								deleteComment={deleteComment}
 							/>
 						);
 					})}

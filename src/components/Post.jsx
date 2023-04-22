@@ -9,7 +9,13 @@ import { useState } from "react";
 // publishedAt: Date
 // Content: String
 
-export const Post = ({ author, publishedAt, content }) => {
+export const Post = ({
+	author,
+	publishedAt,
+	content,
+	turnOnModal,
+	deleteComment,
+}) => {
 	const [comments, setComments] = useState([]);
 	const [newComment, setNewComment] = useState("");
 
@@ -20,7 +26,17 @@ export const Post = ({ author, publishedAt, content }) => {
 	};
 
 	const setNewCommentText = (e) => {
+		event.target.setCustomValidity("");
 		setNewComment(e.target.value);
+	};
+
+	const handleDeleteComment = (comment) => {
+		turnOnModal(true);
+		deleteComment(comments, setComments, comment);
+	};
+
+	const handleNewCommentInvalid = () => {
+		event.target.setCustomValidity("Esse campo é obrigatório.");
 	};
 
 	const publishedDateFormatted = format(
@@ -37,56 +53,68 @@ export const Post = ({ author, publishedAt, content }) => {
 	});
 
 	return (
-		<article className={styles.post}>
-			<header>
-				<div className={styles.author}>
-					<Avatar imageUrl={author.avatarUrl} />
-					<div className={styles.authorInfo}>
-						<strong>{author.name}</strong>
-						<span>{author.role}</span>
+		<>
+			<article className={styles.post}>
+				<header>
+					<div className={styles.author}>
+						<Avatar imageUrl={author.avatarUrl} />
+						<div className={styles.authorInfo}>
+							<strong>{author.name}</strong>
+							<span>{author.role}</span>
+						</div>
 					</div>
+
+					<time
+						title={publishedDateFormatted}
+						dateTime={publishedAt.toISOString()}>
+						{publishedDateRelativeToNow}
+					</time>
+				</header>
+
+				<div className={styles.content}>
+					{content.map((line) => {
+						if (line.type === "paragraph") {
+							return <p key={line.content}>{line.content}</p>;
+						} else if (line.type === "link") {
+							return (
+								<p key={line.content}>
+									<a href="#">{line.content}</a>
+								</p>
+							);
+						}
+					})}
 				</div>
 
-				<time
-					title={publishedDateFormatted}
-					dateTime={publishedAt.toISOString()}>
-					{publishedDateRelativeToNow}
-				</time>
-			</header>
+				<form onSubmit={handleCreateNewComment} className={styles.commentForm}>
+					<strong>Deixe seu feedback</strong>
+					<textarea
+						required
+						onInvalid={handleNewCommentInvalid}
+						name="comment"
+						placeholder="Deixe um comentário"
+						onChange={setNewCommentText}
+						value={newComment}
+					/>
 
-			<div className={styles.content}>
-				{content.map((line) => {
-					if (line.type === "paragraph") {
-						return <p>{line.content}</p>;
-					} else if (line.type === "link") {
+					<footer>
+						<button disabled={newComment.length === 0} type="submit">
+							Publicar
+						</button>
+					</footer>
+				</form>
+
+				<div className={styles.commentList}>
+					{comments.map((comment) => {
 						return (
-							<p>
-								<a href="#">{line.content}</a>
-							</p>
+							<Comment
+								key={comment}
+								content={comment}
+								OnDeleteComment={handleDeleteComment}
+							/>
 						);
-					}
-				})}
-			</div>
-
-			<form onSubmit={handleCreateNewComment} className={styles.commentForm}>
-				<strong>Deixe seu feedback</strong>
-				<textarea
-					name="comment"
-					placeholder="Deixe um comentário"
-					onChange={setNewCommentText}
-					value={newComment}
-				/>
-
-				<footer>
-					<button type="submit">Publicar</button>
-				</footer>
-			</form>
-
-			<div className={styles.commentList}>
-				{comments.map((comment) => {
-					return <Comment content={comment} />;
-				})}
-			</div>
-		</article>
+					})}
+				</div>
+			</article>
+		</>
 	);
 };
